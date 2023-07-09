@@ -8,5 +8,3 @@ export function createDevServer(root: string) {
     plugins: [pluginIndexHtml(), pluginReact()]
   });
 }
-
-console.log('test');
