@@ -17,3 +17,5 @@ export const SERVER_ENTRY_PATH = path.join(
 );
 
 export const DEFAULT_TEMPLATE_PATH = path.join(PACKAGE_ROOT, 'template.html');
+
+console.log('__dirname===22', DEFAULT_TEMPLATE_PATH);

@@ -22,9 +22,13 @@ export async function bundle(root: string) {
     };
   };
   const clientBuild = async () => {
+    console.log('clientBuild');
+
     return viteBuild(resolveViteConfig(false));
   };
   const serverBuild = async () => {
+    console.log('serverBuild');
+
     return viteBuild(resolveViteConfig(true));
   };
   // const spinner = ora('Loading unicorns').start();

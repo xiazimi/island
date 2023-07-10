@@ -30,6 +30,7 @@ var SERVER_ENTRY_PATH = path2.join(
   "ssr-entry.tsx"
 );
 var DEFAULT_TEMPLATE_PATH = path2.join(PACKAGE_ROOT, "template.html");
+console.log("__dirname===22", DEFAULT_TEMPLATE_PATH);
 
 // src/node/plugin-island/indexHtml.ts
 function pluginIndexHtml() {
@@ -69,7 +70,44 @@ function pluginIndexHtml() {
 
 // src/node/dev.ts
 import pluginReact from "@vitejs/plugin-react";
-function createDevServer(root) {
+
+// src/node/config.ts
+import fs from "fs-extra";
+import { resolve } from "path";
+import { loadConfigFromFile } from "vite";
+function getUserConfigPath(root) {
+  try {
+    const supportConfigFiles = ["config.ts", "config.js"];
+    const configPath = supportConfigFiles.map((file) => resolve(root, file)).find(fs.pathExistsSync);
+    return configPath;
+  } catch (e) {
+    console.error(`Failed to load user config: ${e}`);
+    throw e;
+  }
+}
+async function resolveConfig(root, command, mode) {
+  const configPath = getUserConfigPath(root);
+  const result = await loadConfigFromFile(
+    {
+      command,
+      mode
+    },
+    configPath,
+    root
+  );
+  if (result) {
+    const { config: rawConfig = {} } = result;
+    const userConfig = await (typeof rawConfig === "function" ? rawConfig() : rawConfig);
+    return [configPath, userConfig];
+  } else {
+    return [configPath, {}];
+  }
+}
+
+// src/node/dev.ts
+async function createDevServer(root) {
+  const config = await resolveConfig(root, "serve", "development");
+  console.log(config, root);
   return createServer({
     root,
     plugins: [pluginIndexHtml(), pluginReact()],
@@ -84,7 +122,7 @@ function createDevServer(root) {
 // src/node/build.ts
 import { build as viteBuild } from "vite";
 import * as path3 from "path";
-import fs from "fs-extra";
+import fs2 from "fs-extra";
 async function bundle(root) {
   const resolveViteConfig = (isServer) => {
     return {
@@ -103,9 +141,11 @@ async function bundle(root) {
     };
   };
   const clientBuild = async () => {
+    console.log("clientBuild");
     return viteBuild(resolveViteConfig(false));
   };
   const serverBuild = async () => {
+    console.log("serverBuild");
     return viteBuild(resolveViteConfig(true));
   };
   try {
@@ -138,9 +178,9 @@ async function renderPage(render, root, clientBundle) {
     <script type="module" src="/${clientChunk?.fileName}"></script>
   </body> 
 </html>`.trim();
-  await fs.ensureDir(path3.join(root, "build"));
-  await fs.writeFile(path3.join(root, "build/index.html"), html);
-  await fs.remove(path3.join(root, ".temp"));
+  await fs2.ensureDir(path3.join(root, "build"));
+  await fs2.writeFile(path3.join(root, "build/index.html"), html);
+  await fs2.remove(path3.join(root, ".temp"));
 }
 async function build(root = process.cwd()) {
   const [clientBundle] = await bundle(root);

@@ -6,8 +6,6 @@ function renderInBrowser() {
   if (!containerEl) {
     throw new Error('#root element not found');
   }
-  console.log(124, '===');
-
   createRoot(containerEl).render(<App />);
 }
 
