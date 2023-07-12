@@ -1,8 +1,11 @@
 import {
   CLINET_ENTRY_PATH,
-  SERVER_ENTRY_PATH
-} from "./chunk-QUYDBMK7.mjs";
-import "./chunk-UCMORAUH.mjs";
+  SERVER_ENTRY_PATH,
+  pluginConfig
+} from "./chunk-NY7WKYZP.mjs";
+import {
+  resolveConfig
+} from "./chunk-TMPRKMCD.mjs";
 
 // src/node/cli.ts
 import cac from "cac";
@@ -11,11 +14,16 @@ import cac from "cac";
 import { build as viteBuild } from "vite";
 import * as path from "path";
 import fs from "fs-extra";
-async function bundle(root) {
+import pluginReact from "@vitejs/plugin-react";
+async function bundle(root, config) {
   const resolveViteConfig = (isServer) => {
     return {
       mode: "production",
       root,
+      plugins: [pluginReact(), pluginConfig(config)],
+      ssr: {
+        noExternal: ["react-router-dom"]
+      },
       build: {
         ssr: isServer,
         outDir: isServer ? ".temp" : "build",
@@ -70,8 +78,8 @@ async function renderPage(render, root, clientBundle) {
   await fs.writeFile(path.join(root, "build/index.html"), html);
   await fs.remove(path.join(root, ".temp"));
 }
-async function build(root = process.cwd()) {
-  const [clientBundle] = await bundle(root);
+async function build(root = process.cwd(), config) {
+  const [clientBundle] = await bundle(root, config);
   const serverEntryPath = path.join(root, ".temp", "ssr-entry.js");
   console.log("111------000", serverEntryPath);
   const { render } = await import(path.resolve(serverEntryPath));
@@ -79,6 +87,7 @@ async function build(root = process.cwd()) {
 }
 
 // src/node/cli.ts
+import { resolve as resolve2 } from "path";
 var cli = cac("island").version("0.0.1").help();
 cli.command("dev [root]", "start dev server").action(async (root) => {
   const createServer = async () => {
@@ -93,6 +102,9 @@ cli.command("dev [root]", "start dev server").action(async (root) => {
   await createServer();
 });
 cli.command("build [root]", "build in production").action(async (root) => {
-  await build(root);
+  root = resolve2(root);
+  console.log("root===", root);
+  const config = await resolveConfig(root, "build", "production");
+  await build(root, config);
 });
 cli.parse();

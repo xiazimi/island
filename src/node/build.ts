@@ -3,12 +3,19 @@ import { CLINET_ENTRY_PATH, SERVER_ENTRY_PATH } from './constants';
 import type { RollupOutput } from 'rollup';
 import * as path from 'path';
 import fs from 'fs-extra';
+import { SiteConfig } from 'shared/types';
+import pluginReact from '@vitejs/plugin-react';
+import { pluginConfig } from './plugin-island/config';
 
-export async function bundle(root: string) {
+export async function bundle(root: string, config: SiteConfig) {
   const resolveViteConfig = (isServer: boolean): InlineConfig => {
     return {
       mode: 'production',
       root,
+      plugins: [pluginReact(), pluginConfig(config)],
+      ssr: {
+        noExternal: ['react-router-dom']
+      },
       build: {
         ssr: isServer,
         outDir: isServer ? '.temp' : 'build',
@@ -73,8 +80,8 @@ export async function renderPage(
   await fs.remove(path.join(root, '.temp'));
 }
 
-export async function build(root: string = process.cwd()) {
-  const [clientBundle] = await bundle(root);
+export async function build(root: string = process.cwd(), config: SiteConfig) {
+  const [clientBundle] = await bundle(root, config);
 
   // 引入 ssr 入口模块
   const serverEntryPath = path.join(root, '.temp', 'ssr-entry.js');

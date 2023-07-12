@@ -1,7 +1,11 @@
 "use strict"; function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } newObj.default = obj; return newObj; } } function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; } function _optionalChain(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
 
 
-var _chunkESLU3JVIjs = require('./chunk-ESLU3JVI.js');
+
+var _chunkXNJND7S7js = require('./chunk-XNJND7S7.js');
+
+
+var _chunk3IVNSFRAjs = require('./chunk-3IVNSFRA.js');
 
 // src/node/cli.ts
 var _cac = require('cac'); var _cac2 = _interopRequireDefault(_cac);
@@ -10,16 +14,21 @@ var _cac = require('cac'); var _cac2 = _interopRequireDefault(_cac);
 var _vite = require('vite');
 var _path = require('path'); var path = _interopRequireWildcard(_path);
 var _fsextra = require('fs-extra'); var _fsextra2 = _interopRequireDefault(_fsextra);
-async function bundle(root) {
+var _pluginreact = require('@vitejs/plugin-react'); var _pluginreact2 = _interopRequireDefault(_pluginreact);
+async function bundle(root, config) {
   const resolveViteConfig = (isServer) => {
     return {
       mode: "production",
       root,
+      plugins: [_pluginreact2.default.call(void 0, ), _chunkXNJND7S7js.pluginConfig.call(void 0, config)],
+      ssr: {
+        noExternal: ["react-router-dom"]
+      },
       build: {
         ssr: isServer,
         outDir: isServer ? ".temp" : "build",
         rollupOptions: {
-          input: isServer ? _chunkESLU3JVIjs.SERVER_ENTRY_PATH : _chunkESLU3JVIjs.CLINET_ENTRY_PATH,
+          input: isServer ? _chunkXNJND7S7js.SERVER_ENTRY_PATH : _chunkXNJND7S7js.CLINET_ENTRY_PATH,
           output: {
             format: isServer ? "cjs" : "esm"
           }
@@ -69,8 +78,8 @@ async function renderPage(render, root, clientBundle) {
   await _fsextra2.default.writeFile(path.join(root, "build/index.html"), html);
   await _fsextra2.default.remove(path.join(root, ".temp"));
 }
-async function build(root = process.cwd()) {
-  const [clientBundle] = await bundle(root);
+async function build(root = process.cwd(), config) {
+  const [clientBundle] = await bundle(root, config);
   const serverEntryPath = path.join(root, ".temp", "ssr-entry.js");
   console.log("111------000", serverEntryPath);
   const { render } = await Promise.resolve().then(() => _interopRequireWildcard(require(path.resolve(serverEntryPath))));
@@ -78,6 +87,7 @@ async function build(root = process.cwd()) {
 }
 
 // src/node/cli.ts
+
 var cli = _cac2.default.call(void 0, "island").version("0.0.1").help();
 cli.command("dev [root]", "start dev server").action(async (root) => {
   const createServer = async () => {
@@ -92,6 +102,9 @@ cli.command("dev [root]", "start dev server").action(async (root) => {
   await createServer();
 });
 cli.command("build [root]", "build in production").action(async (root) => {
-  await build(root);
+  root = _path.resolve.call(void 0, root);
+  console.log("root===", root);
+  const config = await _chunk3IVNSFRAjs.resolveConfig.call(void 0, root, "build", "production");
+  await build(root, config);
 });
 cli.parse();
