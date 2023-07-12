@@ -1,3 +1,5 @@
-export default {
-  name: '邱念'
-};
+import { defineConfig } from '../dist';
+
+export default defineConfig({
+  title: '邱念34'
+});
