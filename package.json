@@ -51,8 +51,10 @@
     "vitest": "^0.33.0"
   },
   "dependencies": {
+    "@loadable/component": "^5.15.3",
     "@vitejs/plugin-react": "^4.0.2",
     "cac": "^6.7.14",
+    "fast-glob": "^3.3.0",
     "fs-extra": "^11.1.1",
     "ora": "^6.3.1",
     "react": "^18.2.0",
