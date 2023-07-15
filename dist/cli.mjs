@@ -1,8 +1,8 @@
 import {
   CLINET_ENTRY_PATH,
   SERVER_ENTRY_PATH,
-  pluginConfig
-} from "./chunk-NY7WKYZP.mjs";
+  createVitePlugins
+} from "./chunk-W2YKH2VG.mjs";
 import {
   resolveConfig
 } from "./chunk-TMPRKMCD.mjs";
@@ -14,13 +14,12 @@ import cac from "cac";
 import { build as viteBuild } from "vite";
 import * as path from "path";
 import fs from "fs-extra";
-import pluginReact from "@vitejs/plugin-react";
 async function bundle(root, config) {
   const resolveViteConfig = (isServer) => {
     return {
       mode: "production",
       root,
-      plugins: [pluginReact(), pluginConfig(config)],
+      plugins: createVitePlugins(config),
       ssr: {
         noExternal: ["react-router-dom"]
       },

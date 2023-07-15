@@ -2,7 +2,7 @@
 
 
 
-var _chunkXNJND7S7js = require('./chunk-XNJND7S7.js');
+var _chunkN5COHRQMjs = require('./chunk-N5COHRQM.js');
 
 
 var _chunk3IVNSFRAjs = require('./chunk-3IVNSFRA.js');
@@ -14,13 +14,12 @@ var _cac = require('cac'); var _cac2 = _interopRequireDefault(_cac);
 var _vite = require('vite');
 var _path = require('path'); var path = _interopRequireWildcard(_path);
 var _fsextra = require('fs-extra'); var _fsextra2 = _interopRequireDefault(_fsextra);
-var _pluginreact = require('@vitejs/plugin-react'); var _pluginreact2 = _interopRequireDefault(_pluginreact);
 async function bundle(root, config) {
   const resolveViteConfig = (isServer) => {
     return {
       mode: "production",
       root,
-      plugins: [_pluginreact2.default.call(void 0, ), _chunkXNJND7S7js.pluginConfig.call(void 0, config)],
+      plugins: _chunkN5COHRQMjs.createVitePlugins.call(void 0, config),
       ssr: {
         noExternal: ["react-router-dom"]
       },
@@ -28,7 +27,7 @@ async function bundle(root, config) {
         ssr: isServer,
         outDir: isServer ? ".temp" : "build",
         rollupOptions: {
-          input: isServer ? _chunkXNJND7S7js.SERVER_ENTRY_PATH : _chunkXNJND7S7js.CLINET_ENTRY_PATH,
+          input: isServer ? _chunkN5COHRQMjs.SERVER_ENTRY_PATH : _chunkN5COHRQMjs.CLINET_ENTRY_PATH,
           output: {
             format: isServer ? "cjs" : "esm"
           }

@@ -4,15 +4,14 @@ import type { RollupOutput } from 'rollup';
 import * as path from 'path';
 import fs from 'fs-extra';
 import { SiteConfig } from 'shared/types';
-import pluginReact from '@vitejs/plugin-react';
-import { pluginConfig } from './plugin-island/config';
+import { createVitePlugins } from './vitePlugins';
 
 export async function bundle(root: string, config: SiteConfig) {
   const resolveViteConfig = (isServer: boolean): InlineConfig => {
     return {
       mode: 'production',
       root,
-      plugins: [pluginReact(), pluginConfig(config)],
+      plugins: createVitePlugins(config),
       ssr: {
         noExternal: ['react-router-dom']
       },
